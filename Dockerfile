@@ -20,6 +20,7 @@ RUN apt-get update \
     curl \
     rsync \
     openssh-client \
+    ca-certificates-java \
     openjdk-17-jdk \
     graphviz
 
