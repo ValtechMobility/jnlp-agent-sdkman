@@ -20,7 +20,8 @@ RUN apt-get update \
     curl \
     rsync \
     openssh-client \
-    openjdk-17-jdk
+    openjdk-17-jdk \
+    graphviz
 
 USER ${user}
 
