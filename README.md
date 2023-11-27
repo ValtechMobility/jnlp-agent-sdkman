@@ -1,1 +1,1 @@
-# jnlp-agent-jdk17
+# jnlp-agent-sdkman
