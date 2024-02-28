@@ -77,7 +77,10 @@ RUN yes | sdkmanager \
     "extras;android;m2repository" \
     "extras;google;m2repository"
 
-RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install java 21-tem && sdk use java 21-tem
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install java 21-tem && sdk use java 21-tem && \
+    sdk install java 17-tem && \
+    sdk install maven \
+
 
 USER ${user}
 
