@@ -27,6 +27,13 @@ RUN apt-get update \
 
 RUN curl -s "https://get.sdkman.io" | bash
 
+RUN curl -SsL https://downloads.gauge.org/stable | sh
+
+RUN gauge install java
+RUN gauge install xml-report
+
+RUN gauge version
+
 SHELL ["/bin/bash", "-c"]
 
 
