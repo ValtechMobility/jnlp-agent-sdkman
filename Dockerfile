@@ -86,7 +86,7 @@ RUN yes | sdkmanager \
 
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && \
     sdk install maven && \
-    sdk install java 17-tem && \
+    sdk install java 17.0.10-tem && \
     sdk install java 21-tem && \
     sdk use java 21-tem
 
