@@ -25,8 +25,6 @@ RUN apt-get update \
     ca-certificates-java \
     graphviz
 
-RUN curl -s "https://get.sdkman.io" | bash
-
 RUN curl -SsL https://downloads.gauge.org/stable | sh
 
 RUN gauge install java
@@ -84,14 +82,15 @@ RUN yes | sdkmanager \
     "extras;android;m2repository" \
     "extras;google;m2repository"
 
+USER ${user}
+
+RUN curl -s "https://get.sdkman.io" | bash
+
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && \
     sdk install maven && \
     sdk install java 17.0.10-tem && \
     sdk install java 21-tem && \
     sdk use java 21-tem
-
-
-USER ${user}
 
 RUN java --version
 RUN which java
