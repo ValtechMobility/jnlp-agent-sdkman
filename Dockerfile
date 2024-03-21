@@ -23,7 +23,27 @@ RUN apt-get update \
     rsync \
     openssh-client \
     ca-certificates-java \
-    graphviz
+    xvfb \
+    gnupg \
+    gnupg1 \
+    gnupg2 \
+    libxi6 \
+    libgconf-2-4 \
+    graphviz  && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get -y update \
+    && apt-get -y install google-chrome-stable
+
+RUN wget -q https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/118.0.5993.70/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip \
+    && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
+    && chmod +x /usr/bin/chromedriver \
+    && rm -f chromedriver_linux64.zip
+
+RUN google-chrome --version
+RUN chromedriver --version
 
 RUN curl -SsL https://downloads.gauge.org/stable | sh
 
@@ -54,6 +74,7 @@ SHELL ["/bin/bash", "-c"]
 
 ENV ANDROID_HOME /opt/sdk
 ENV ANDROID_SDK_ROOT /opt/sdk
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p ${ANDROID_SDK_ROOT}
 RUN chmod -Rf 777 ${ANDROID_SDK_ROOT}
