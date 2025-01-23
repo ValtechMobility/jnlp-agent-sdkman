@@ -1,2 +1,2 @@
 # jnlp-agent-sdkman
-sdkman + chromedriver
+sdkman + latest chromedriver
