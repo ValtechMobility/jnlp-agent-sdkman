@@ -16,34 +16,40 @@ RUN chmod +x /usr/local/bin/jenkins-agent &&\
 
 RUN apt-get update \
   && apt-get -y install \
-    unzip \
-    curl \
-    zip \
-    wget \
-    rsync \
+    unzip curl zip wget rsync \
     openssh-client \
     ca-certificates-java \
     xvfb \
-    gnupg \
-    gnupg1 \
-    gnupg2 \
+    gnupg gnupg1 gnupg2 \
+    libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev \
+    libasound2 \
     libxi6 \
     libgconf-2-4 \
     graphviz  && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get -y update \
-    && apt-get -y install google-chrome-stable
+# Fetch the latest stable Chrome version and install Chrome and ChromeDriver
+RUN CHROME_VERSION=$(curl -sSL https://googlechromelabs.github.io/chrome-for-testing/ | awk -F 'Version:' '/Stable/ {print $2}' | awk '{print $1}' | sed 's/<code>//g; s/<\/code>//g') && \
+    CHROME_URL="https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip" && \
+    echo "Fetching Chrome version: ${CHROME_VERSION}" && \
+    curl -sSL ${CHROME_URL} -o /tmp/chrome-linux64.zip && \
+    mkdir -p /opt/google/chrome && \
+    mkdir -p /usr/local/bin && \
+    unzip -q /tmp/chrome-linux64.zip -d /opt/google/chrome && \
+    rm /tmp/chrome-linux64.zip
 
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/128.0.6613.119/linux64/chromedriver-linux64.zip \
+RUN CHROME_VERSION=$(curl -sSL https://googlechromelabs.github.io/chrome-for-testing/ | awk -F 'Version:' '/Stable/ {print $2}' | awk '{print $1}' | sed 's/<code>//g; s/<\/code>//g') && \
+    CHROME_DRIVER_URL="https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" && \
+    echo "Fetching Chrome driver version: ${CHROME_DRIVER_URL}" && \
+    wget -q $CHROME_DRIVER_URL \
     && unzip chromedriver-linux64.zip \
     && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
     && chmod +x /usr/bin/chromedriver \
     && rm -f chromedriver_linux64.zip
 
-RUN google-chrome --version
 RUN chromedriver --version
+RUN ln -s /opt/google/chrome/chrome-linux64/chrome /usr/local/bin/google-chrome
+RUN ln -s /opt/google/chrome/chrome-linux64/chrome /usr/local/bin/chrome
+RUN google-chrome --version
 
 RUN curl -SsL https://downloads.gauge.org/stable | sh
 
@@ -53,7 +59,6 @@ RUN gauge install xml-report
 RUN gauge version
 
 SHELL ["/bin/bash", "-c"]
-
 
 # GitVersion
 RUN wget https://github.com/GitTools/GitVersion/releases/download/5.12.0/gitversion-linux-x64-5.12.0.tar.gz
@@ -72,8 +77,8 @@ RUN dpkg --add-architecture i386 && apt-get update && DEBIAN_FRONTEND=noninterac
 
 SHELL ["/bin/bash", "-c"]
 
-ENV ANDROID_HOME /opt/sdk
-ENV ANDROID_SDK_ROOT /opt/sdk
+ENV ANDROID_HOME=/opt/sdk
+ENV ANDROID_SDK_ROOT=/opt/sdk
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p ${ANDROID_SDK_ROOT}
@@ -83,7 +88,7 @@ RUN cd ${ANDROID_SDK_ROOT} && wget https://dl.google.com/android/repository/comm
 RUN cd ${ANDROID_SDK_ROOT} && mkdir tmp && unzip sdk-tools.zip -d tmp && rm sdk-tools.zip
 RUN cd ${ANDROID_SDK_ROOT} && mkdir -p cmdline-tools/latest && mv tmp/cmdline-tools/* cmdline-tools/latest
 
-ENV PATH ${PATH}:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin
+ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin
 
 # Accept licenses before installing components, no need to echo y for each component
 # License is valid for all the standard components in versions installed from this file
