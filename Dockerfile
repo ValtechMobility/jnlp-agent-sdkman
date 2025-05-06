@@ -100,7 +100,7 @@ RUN sdkmanager --install "ndk;25.1.8937393" "cmake;3.22.1"
 
 # Please keep all sections in descending order!
 # list all platforms, sort them in descending order, take the newest 8 versions and install them
-RUN yes | sdkmanager $( sdkmanager --list 2>/dev/null| grep platforms | awk -F' ' '{print $1}' | sort -nr -k2 -t- | head -12 | uniq )
+RUN yes | sdkmanager $( sdkmanager --list 2>/dev/null| grep platforms | grep -v "\-ext" | awk -F' ' '{print $1}' | sort -nr -k2 -t- | head -12 | uniq )
 # list all build-tools, sort them in descending order and install them
 # skip rc versions, increase head count - versions are found twice (actual matches will now be ~5)
 RUN yes | sdkmanager $( sdkmanager --list 2>/dev/null | grep build-tools | grep -v "\-rc" | awk -F' ' '{print $1}' | sort -nr -k2 -t\; | head -14 | uniq )
